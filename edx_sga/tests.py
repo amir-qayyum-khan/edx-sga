@@ -246,6 +246,7 @@ class StaffGradedAssignmentXblockTests(unittest.TestCase):
 
     def test_save_sga(self):
         orig_score = 23
+        orig_weight = 11.0
         block = self.make_one()
         block.save_sga(mock.Mock(body='{}'))
         self.assertEqual(block.display_name, "Staff Graded Assignment")
@@ -272,6 +273,21 @@ class StaffGradedAssignmentXblockTests(unittest.TestCase):
             "points": '24.5',
             "weight": 11})))
         self.assertEqual(block.points, orig_score)
+
+        # Test negative weight doesn't work
+        block.save_sga(mock.Mock(method="POST", body=json.dumps({
+            "display_name": "Test Block",
+            "points": '100',
+            "weight": -10.0})))
+        self.assertEqual(block.weight, orig_weight)
+
+        # Test string weight doesn't work
+        block.save_sga(mock.Mock(method="POST", body=json.dumps({
+            "display_name": "Test Block",
+            "points": '100',
+            "weight": "a"})))
+        self.assertEqual(block.weight, orig_weight)
+
 
     def test_upload_download_assignment(self):
         path = pkg_resources.resource_filename(__package__, 'tests.py')
