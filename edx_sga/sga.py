@@ -328,7 +328,35 @@ class StaffGradedAssignmentXBlock(XBlock):
         if points < 0:
             raise JsonHandlerError(400, 'Points must be a positive integer')
         self.points = points
+        try:
+            cls = type(self)
 
+            def none_to_empty(x):
+                return x if x is not None else ''
+            edit_fields = (
+                (field, none_to_empty(getattr(self, field.name)), validator)
+                for field, validator in (
+                    (cls.display_name, 'string'),
+                    (cls.points, 'number'),
+                    (cls.weight, 'number'))
+            )
+
+            context = {
+                'fields': edit_fields
+            }
+            fragment = Fragment()
+            fragment.add_content(
+                render_template(
+                    'templates/staff_graded_assignment/edit.html',
+                    context
+                )
+            )
+            fragment.add_javascript(_resource("static/js/src/studio.js"))
+            fragment.initialize_js('StaffGradedAssignmentXBlock')
+            return fragment
+        except:  # pragma: NO COVER
+            log.error("Don't swallow my exceptions", exc_info=True)
+            raise
 
     @XBlock.handler
     def upload_assignment(self, request, suffix=''):
