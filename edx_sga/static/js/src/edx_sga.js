@@ -101,7 +101,7 @@ function StaffGradedAssignmentXBlock(runtime, element) {
                 }
             });
 
-            updateChangeEvent(fileUpload);
+            updateChangeEvent(fileUploadObj);
         }
 
         function renderStaffGrading(data) {
